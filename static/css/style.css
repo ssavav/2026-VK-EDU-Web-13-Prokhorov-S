@@ -18,6 +18,11 @@
     object-fit:cover;
 }
 
+.ask-btn-header{
+    text-decoration: none;
+    color: white;
+}
+
 .tag-perl { 
     color: #666; 
 }

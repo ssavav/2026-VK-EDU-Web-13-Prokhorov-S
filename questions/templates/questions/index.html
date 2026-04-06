@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="d-flex align-items-baseline my-3 gap-4">
+        <h3>New Questions</h3>
+        <a href="{% url 'hot' %}" id="hot-questions-link">Hot questions</a>
+    </div>
+
+    {% for question in questions %}
+        {% include 'questions/card.html' %}
+    {% endfor %}
+    
+    {% include 'pagination.html' %}
+{% endblock %}

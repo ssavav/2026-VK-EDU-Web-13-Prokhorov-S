@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="question-list">
+    <div class="main-question-card p-3 my-3">
+        <div class="row">
+            <div class="col-2 col-md-1">
+                <img src="{% static 'img/avatar.jpg' %}" alt="avatar" class="main-avatar-img mb-2">
+                <div class="d-flex align-items-center mt-2">
+                    <button type="button" class="btn btn-outline-success btn-sm px-1 py-0 fw-bold" title="Like">&#9650;</button>
+                    <span class="fw-bold mx-1 my-1 fs-5">5</span>
+                    <button type="button" class="btn btn-outline-danger btn-sm px-1 py-0 fw-bold" title="Dislike">&#9660;</button>
+                </div>
+            </div>
+
+            <div class="col-10 col-md-11 ps-4">
+                <a href="#" class="h3 mb-2">How to build a moon park?</a>
+                <p class="my-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                
+                <div class="d-flex gap-3 align-items-center mt-3">
+                    <a href="#">answer (3)</a>
+                    <div>
+                        Tags: 
+                        <a href="{% url 'tag' tag_name='black-jack' %}">black-jack</a> 
+                        <a href="{% url 'tag' tag_name='bender' %}">bender</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for answer in answers %}
+        {% include 'questions/answer_card.html' %}
+    {% endfor %}
+</div>
+
+<div class="answer-part mt-3">
+    <div class="input-group">
+        <textarea class="form-control answer-area" rows="5" placeholder="Enter your answer here...(max. 1000 characters)" aria-label="With textarea"></textarea>
+    </div>
+    <button type="button" class="btn btn-answer my-4 px-4 py-2">Answer</button>
+</div>
+
+
+{% endblock %}

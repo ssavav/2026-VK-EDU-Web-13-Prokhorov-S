@@ -1,0 +1,25 @@
+{% load static %}
+
+<div class="question-card p-3 mb-3">
+    <div class="row">
+        <div class="col-2 col-md-1">
+            <img src="{% static 'img/avatar.jpg' %}" alt="avatar" class="avatar-img mb-2">
+            <div class="d-flex align-items-center mt-2">
+                <button type="button" class="btn btn-outline-success btn-sm px-1 py-0 fw-bold" title="Like">&#9650;</button>
+                <span class="fw-bold mx-1 my-1 fs-5">5</span>
+                <button type="button" class="btn btn-outline-danger btn-sm px-1 py-0 fw-bold" title="Dislike">&#9660;</button>
+            </div>
+        </div>
+
+        <div class="col-10 col-md-11">
+            <p class="mb-2">{{ answer.text }}</p>
+            
+            <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" value="" id="correctAnswer{{ answer.id }}">
+                <label class="form-check-label text-success fw-bold" for="correctAnswer{{ answer.id }}">
+                    Correct answer!
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
