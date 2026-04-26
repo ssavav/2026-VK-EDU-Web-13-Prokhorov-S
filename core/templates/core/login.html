@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h3 class="my-3">Log in</h3>
+
+{% include 'core/alert.html' with message="Sorry, wrong login or password!" %}
+
+<div class="row align-items-center mb-3">
+    <div class="col-12 col-md-2 mb-2 mb-md-0">
+        <span class="h5 mb-0">Login</span>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="input-group">
+            <input type="text" class="form-control login-area" placeholder="Enter your login here..." aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+        </div>
+    </div>
+</div>
+
+<div class="row align-items-center mb-3">
+    <div class="col-12 col-md-2 mb-2 mb-md-0">
+        <span class="h5 mb-0">Password</span>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="input-group">
+            <input type="password" class="form-control login-area" placeholder="Enter your password here..." aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+        </div>
+    </div>
+</div>
+<div class="row align-items-center mb-3">
+    <div class="col-12 col-md-2 mb-2 mb-md-0">
+
+    </div>
+    <div class="col-12 col-md-4">
+        <button type="button" class="btn btn-login my-2 px-4 py-2">Log in!</button>
+    </div>
+</div>
+
+<div class="row align-items-center mb-3">
+    <div class="col-12 col-md-2 mb-2 mb-md-0">
+
+    </div>
+    <div class="col-12 col-md-4">
+        <a href="{% url 'signup' %}">create new account</a>
+    </div>
+</div>
+{% endblock %}
