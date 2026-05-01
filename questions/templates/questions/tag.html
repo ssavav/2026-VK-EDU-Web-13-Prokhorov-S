@@ -3,11 +3,15 @@
 
 {% block content %}
     <div class="d-flex align-items-baseline my-3 gap-4">
-        <h3>Tag: Tag</h3>
+        <h3>Tag: {{ tag_name }}</h3>
     </div>
 
     {% for question in questions %}
         {% include 'questions/card.html' %}
+    {% empty %}
+        <div class="alert alert-info">
+            Пока нет ни одного вопроса.
+        </div>
     {% endfor %}
     
     {% include 'pagination.html' %}

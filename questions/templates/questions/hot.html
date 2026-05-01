@@ -8,6 +8,10 @@
 
     {% for question in questions %}
         {% include 'questions/card.html' %}
+    {% empty %}
+        <div class="alert alert-info">
+            Пока нет ни одного вопроса.
+        </div>
     {% endfor %}
     
     {% include 'pagination.html' %}

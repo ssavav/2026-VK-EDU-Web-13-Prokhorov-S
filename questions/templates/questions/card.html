@@ -5,7 +5,7 @@
             <img src="{% static 'img/avatar.jpg' %}" alt="avatar" class="avatar-img mb-2">
             <div class="d-flex align-items-center mt-2">
                 <button type="button" class="btn btn-outline-success btn-sm px-1 py-0 fw-bold" title="Like">&#9650;</button>
-                <span class="fw-bold mx-1 my-1 fs-5">5</span>
+                    <span class="fw-bold mx-1 my-1 fs-5">{{ question.rating }}</span>
                 <button type="button" class="btn btn-outline-danger btn-sm px-1 py-0 fw-bold" title="Dislike">&#9660;</button>
             </div>
         </div>
@@ -15,10 +15,10 @@
             <p class="mb-2">{{ question.text }}</p>
             
             <div class="d-flex gap-3 align-items-center mt-4">
-                <a href="{% url 'question' question.id %}">answer (3)</a>
+                <a href="{% url 'question' question.id %}">answer ({{ question.answers.count }})</a>
                 <div>
                     Tags: 
-                    {% for tag in question.tags %}
+                    {% for tag in question.tags.all %}
                         <a href="{% url 'tag' tag %}">{{ tag }}</a> 
                     {% endfor %}
                 </div>
