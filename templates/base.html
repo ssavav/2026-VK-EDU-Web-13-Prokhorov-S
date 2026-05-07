@@ -25,9 +25,15 @@
                     <div class="col-12 col-md-6 col-lg-7">
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="button-addon">
+                            {% if user.is_authenticated %}
                             <a href="{% url 'ask' %}" class="btn btn-success fw-bold text-white btn-ask-header text-decoration-none" id="button-addon" style="display: flex; align-items: center;">
                                 ASK!
                             </a>
+                            {% else %}
+                            <a href="#" class="btn btn-success fw-bold text-white btn-ask-header text-decoration-none disabled" id="button-addon" style="display: flex; align-items: center;" aria-disabled="true">
+                                ASK!
+                            </a>
+                            {% endif %}
                         </div>
                     </div>   
                     <div class="col-12 col-md-3 col-lg-2 d-flex justify-content-center justify-content-md-end align-items-center">
@@ -42,7 +48,7 @@
                                 
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'settings' %}" class="text-secondary text-decoration-none mt-1">Settings</a>
-                                    <a href="#" class="text-danger text-decoration-none mt-1">Log out</a>
+                                <a href="{% url 'logout' %}" class="text-danger text-decoration-none mt-1">Log out</a>
                                 </div>
                             </div>
                         {% else %}
@@ -71,14 +77,14 @@
                         <section class="my-5">
                             <h3 class="h4 mb-3">Popular Tags</h3>
                             <div class="d-flex flex-wrap gap-2 align-items-baseline">
-                                <span class="tag-perl">perl</span>
-                                <span class="tag-python">python</span>
-                                <span class="tag-technopark">TechnoPark</span>
-                                <span class="tag-mysql">MySQL</span>
-                                <span class="tag-django">django</span>
-                                <span class="small text-muted">Mail.Ru</span>
-                                <span class="small">Voloshin</span>
-                                <span class="tag-firefox">Firefox</span>
+                                <a href="{% url 'tag' tag_name='perl' %}" class="tag-perl text-decoration-none">perl</a>
+                                <a href="{% url 'tag' tag_name='python' %}" class="tag-python text-decoration-none">python</a>
+                                <a href="{% url 'tag' tag_name='TechnoPark' %}" class="tag-technopark text-decoration-none">TechnoPark</a>
+                                <a href="{% url 'tag' tag_name='MySQL' %}" class="tag-mysql text-decoration-none">MySQL</a>
+                                <a href="{% url 'tag' tag_name='django' %}" class="tag-django text-decoration-none">django</a>
+                                <a href="{% url 'tag' tag_name='Mail.Ru' %}" class="small text-muted text-decoration-none">Mail.Ru</a>
+                                <a href="{% url 'tag' tag_name='Voloshin' %}" class="small text-decoration-none">Voloshin</a>
+                                <a href="{% url 'tag' tag_name='Firefox' %}" class="tag-firefox text-decoration-none">Firefox</a>
                             </div>
                         </section>
 

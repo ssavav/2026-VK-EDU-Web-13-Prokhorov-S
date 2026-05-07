@@ -9,8 +9,8 @@
     {% for question in questions %}
         {% include 'questions/card.html' %}
     {% empty %}
-        <div class="alert alert-info">
-            Пока нет ни одного вопроса.
+        <div class="alert alert-warning">
+            No questions yet
         </div>
     {% endfor %}
     

@@ -2,66 +2,42 @@
 {% load static %}
 
 {% block content %}
-<h3 class="my-3">Settings: {{ request.user.username|default:"NickName" }}</h3>
+<h3 class="my-3">Settings</h3>
 
-{% include 'core/alert.html' with message="Sorry, this email address is already registered!" %}
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
 
-<div class="row align-items-center mb-3">
-    <div class="col-12 col-md-2 mb-2 mb-md-0">
-        <span class="h5 mb-0">Login</span>
-    </div>
-    <div class="col-12 col-md-4">
-        <div class="input-group">
-            <input type="text" class="form-control login-area" placeholder="Enter your login here..." aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="{{ request.user.username|default:'' }}">
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            {% include 'core/alert.html' with message=error %}
+        {% endfor %}
+    {% endif %}
+
+    {% for field in form %}
+    <div class="row align-items-center mb-3">
+        <div class="col-12 col-md-2 mb-2 mb-md-0">
+            <span class="h5 mb-0">{{ field.label }}</span>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="input-group">
+                {{ field }}
+            </div>
+            {% if field.errors %}
+                <div class="text-danger mt-1 small">
+                    {% for error in field.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
     </div>
-</div>
+    {% endfor %}
 
-<div class="row align-items-center mb-3">
-    <div class="col-12 col-md-2 mb-2 mb-md-0">
-        <span class="h5 mb-0">Email</span>
-    </div>
-    <div class="col-12 col-md-4">
-        <div class="input-group">
-            <input type="email" class="form-control login-area" placeholder="Enter your email here..." aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="{{ request.user.email|default:'' }}">
+    <div class="row align-items-center mb-3">
+        <div class="col-12 col-md-2 mb-2 mb-md-0"></div>
+        <div class="col-12 col-md-4">
+            <button type="submit" class="btn btn-login my-2 px-4 py-2">Save!</button>
         </div>
     </div>
-</div>
-
-<div class="row align-items-center mb-3">
-    <div class="col-12 col-md-2 mb-2 mb-md-0">
-        <span class="h5 mb-0">NickName</span>
-    </div>
-    <div class="col-12 col-md-4">
-        <div class="input-group">
-            <input type="text" class="form-control login-area" placeholder="Enter your nickname here..." aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="{{ request.user.username|default:'' }}">
-        </div>
-    </div>
-</div>
-
-<div class="row align-items-start mb-3">
-    <div class="col-12 col-md-2 mb-2 mb-md-0">
-        <span class="h5 mb-0">Upload avatar</span>
-    </div>
-    
-    <div class="col-12 col-md-4">
-        
-        <div class="mb-3">
-            <img src="{% static 'img/avatar.jpg' %}" alt="avatar" class="main-avatar-img" id="avatar-img-settings">
-        </div>
-        
-        <div class="input-group">
-            <input type="file" class="form-control login-area" id="avatarUpload" accept="image/*">
-        </div>
-    </div>
-</div>
-
-<div class="row align-items-center mb-3">
-    <div class="col-12 col-md-2 mb-2 mb-md-0">
-
-    </div>
-    <div class="col-12 col-md-4">
-        <button type="button" class="btn btn-register my-2 px-4 py-2">Save!</button>
-    </div>
-</div>
+</form>
 {% endblock %}
