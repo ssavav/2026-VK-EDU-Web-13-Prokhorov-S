@@ -4,38 +4,45 @@
 {% block content %}
 <h3 class="my-3">New Question</h3>
 
-<div class="row align-items-center mb-3">
-    <div class="col-12 col-md-1 mb-2 mb-md-0">
-        <span class="h5 mb-0">Title</span>
-    </div>
-    <div class="col-12 col-md-8">
-        <div class="input-group">
-            <input type="text" class="form-control ask-area" placeholder="Enter title here...(max. 255 characters)" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+<form method="POST">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% for field in form %}
+    <div class="row align-items-center mb-3">
+        <div class="col-12 col-md-1 mb-2 mb-md-0">
+            <span class="h5 mb-0">{{ field.label }}</span>
+        </div>
+        <div class="col-12 col-md-8">
+            <div class="input-group">
+                {{ field }}
+            </div>
+            {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
+            {% if field.errors %}
+                <div class="text-danger mt-1 small">
+                    {% for error in field.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
     </div>
-</div>
+    {% endfor %}
 
-<div class="row align-items-center mb-3">
-    <div class="col-12 col-md-1 mb-2 mb-md-0">
-        <span class="h5 mb-0">Text</span>
-    </div>
-    <div class="col-12 col-md-8">
-        <div class="input-group">
-            <textarea class="form-control ask-area" rows="15" placeholder="Enter your question here..." aria-label="With textarea"></textarea>
+    <div class="row">
+        <div class="col-12 col-md-1"></div>
+        <div class="col-12 col-md-8">
+            <button type="submit" class="btn btn-ask my-4 px-4 py-2">Ask!</button>
         </div>
     </div>
-</div>
-
-<div class="row align-items-center mb-3">
-    <div class="col-12 col-md-1 mb-2 mb-md-0">
-        <span class="h5 mb-0">Tags</span>
-    </div>
-    <div class="col-12 col-md-8">
-        <div class="input-group">
-            <input type="text" class="form-control ask-area" placeholder="Enter your tags here...(comma-separated listing, max. 500 characters)" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-        </div>
-    </div>
-</div>
-
-<button type="button" class="btn btn-ask my-4 px-4 py-2">Ask</button>
+</form>
 {% endblock %}

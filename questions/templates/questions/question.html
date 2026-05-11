@@ -32,19 +32,41 @@
 </div>
 
     {% for answer in answers %}
-        {% include 'questions/answer_card.html' %}
+        <div id="answer-{{ answer.id }}">
+            {% include 'questions/answer_card.html' %}
+        </div>
     {% empty %}
         <div class="alert alert-warning">
-            К этому вопросу пока нет ответов.
+            No answers to that question
         </div>
     {% endfor %}
-
-<div class="answer-part mt-3">
-    <div class="input-group">
-        <textarea class="form-control answer-area" rows="5" placeholder="Enter your answer here...(max. 1000 characters)" aria-label="With textarea"></textarea>
+    
+{% if user.is_authenticated %}
+    <form method="POST">
+        {% csrf_token %}
+        <div class="answer-part mt-3">
+            <div class="input-group">
+                {{ form.text }}
+            </div>
+            {% if form.text.errors %}
+                <div class="text-danger small mt-1">{% for error in form.text.errors %}{{ error }}{% endfor %}</div>
+            {% endif %}
+            <button type="submit" class="btn btn-answer my-4 px-4 py-2">Answer</button>
+        </div>
+    </form>
+{% else %}
+    <div class="answer-part mt-3" title="Log in to answer">
+        <fieldset disabled>
+            <div class="input-group">
+                {{ form.text }}
+            </div>
+            <button type="button" class="btn btn-answer my-4 px-4 py-2 disabled">Answer</button>
+        </fieldset>
+        <p class="mt-2 text-muted">
+            Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a> or <a href="{% url 'signup' %}">sign up</a> to leave an answer.
+        </p>
     </div>
-    <button type="button" class="btn btn-answer my-4 px-4 py-2">Answer</button>
-</div>
+{% endif %}
 
 
 {% endblock %}
