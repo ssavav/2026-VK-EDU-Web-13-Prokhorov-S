@@ -47,7 +47,7 @@ def signup(request):
 @login_required(login_url='login')
 def profile(request):
     if request.method == 'POST':
-        form = ProfileSettingsForm(request.POST, instance=request.user)
+        form = ProfileSettingsForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('settings') 
