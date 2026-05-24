@@ -68,3 +68,16 @@ class AnswerForm(forms.ModelForm):
         if commit:
             answer.save()
         return answer
+    
+class VoteForm(forms.Form):
+    action = forms.ChoiceField(choices=[('like', 'like'), ('dislike', 'dislike')])
+
+class QuestionVoteForm(VoteForm):
+    question_id = forms.IntegerField(min_value=1)
+
+class AnswerVoteForm(VoteForm):
+    answer_id = forms.IntegerField(min_value=1)
+
+class MarkCorrectForm(forms.Form):
+    question_id = forms.IntegerField(min_value=1)
+    answer_id = forms.IntegerField(min_value=1)

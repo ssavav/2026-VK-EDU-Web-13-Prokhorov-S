@@ -39,7 +39,11 @@
                     <div class="col-12 col-md-3 col-lg-2 d-flex justify-content-center justify-content-md-end align-items-center">
                         {% if request.user.is_authenticated %}
                             <a href="{% url 'settings' %}">
-                                <img src="{% static 'img/avatar.jpg' %}" class="border border-dark profile-pic">
+                                {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" class="border border-dark profile-pic">
+                                {% else %}
+                                    <img src="{% static 'img/avatar.jpg' %}" class="border border-dark profile-pic">
+                                {% endif %}
                             </a>
                             <div class="d-flex flex-column align-items-center">
                                 <a href="{% url 'settings' %}" class="text-decoration-none text-dark fw-bold lh-1 mb-1">
@@ -111,5 +115,6 @@
         </footer>
 
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
     </body>
 </html>

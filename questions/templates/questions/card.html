@@ -2,11 +2,21 @@
 <div class="question-card p-3 mb-3">
     <div class="row">
         <div class="col-3 col-md-2 col-lg-1 text-center">
-            <img src="{% static 'img/avatar.jpg' %}" alt="avatar" class="avatar-img mb-2">
+            {% if question.author.profile.avatar %}
+                <img src="{{ question.author.profile.avatar.url }}" alt="avatar" class="avatar-img mb-2">
+            {% else %}
+                <img src="{% static 'img/avatar.jpg' %}" alt="avatar" class="avatar-img mb-2">
+            {% endif %}
             <div class="d-flex align-items-center mt-2">
-                <button type="button" class="btn btn-outline-success btn-sm px-1 py-0 fw-bold" title="Like">&#9650;</button>
-                    <span class="fw-bold mx-1 my-1 fs-5">{{ question.rating }}</span>
-                <button type="button" class="btn btn-outline-danger btn-sm px-1 py-0 fw-bold" title="Dislike">&#9660;</button>
+                <button type="button" class="btn btn-outline-success btn-sm px-1 py-0 fw-bold vote-question-btn" 
+                    data-id="{{ question.id }}" data-action="like" 
+                    {% if not user.is_authenticated %}disabled title="Log in to vote"{% endif %}>&#9650;</button>
+                
+                <span class="fw-bold mx-1 my-1 fs-5" id="rating-question-{{ question.id }}">{{ question.rating }}</span>
+
+                <button type="button" class="btn btn-outline-danger btn-sm px-1 py-0 fw-bold vote-question-btn" 
+                    data-id="{{ question.id }}" data-action="dislike" 
+                    {% if not user.is_authenticated %}disabled title="Log in to vote"{% endif %}>&#9660;</button>
             </div>
         </div>
 
