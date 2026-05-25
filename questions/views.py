@@ -1,12 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django import forms
 from .models import Question, Tag, QuestionLike, AnswerLike, Answer
 from .utils import paginate 
 from .forms import AskForm, AnswerForm, QuestionVoteForm, AnswerVoteForm, MarkCorrectForm
 import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from core.tasks import send_new_answer_notification, send_email_notification
+from django.contrib.postgres.search import SearchQuery
+import jwt
+import time
+from django.conf import settings
 
 def index(request):
     questions = Question.objects.new()
@@ -32,6 +38,7 @@ def tag(request, tag_name):
         'questions': page, 
         'tag_name': tag_name
     })
+
 def question(request, question_id):
     question_obj = get_object_or_404(Question, id=question_id)
     answers = question_obj.answers.select_related('author').order_by('-rating', '-created_at')
@@ -42,15 +49,39 @@ def question(request, question_id):
         form = AnswerForm(request.POST, author=request.user, question_obj=question_obj)
         if form.is_valid():
             answer = form.save()
+
+            send_new_answer_notification.delay(
+                question_id=question_id,
+                answer_text=answer.text,
+                author_id=answer.author.id,
+                answer_id=answer.id
+            )
+
+            if question_obj.author.email:
+                send_email_notification.delay(
+                    question_title=question_obj.title,
+                    user_email=question_obj.author.email
+                )
             url = reverse('question', args=[question_id])
             return redirect(f"{url}#answer-{answer.id}")
     else:
         form = AnswerForm()
 
+    user_id = str(request.user.id) if request.user.is_authenticated else ""
+
+    expiration = int(time.time()) + 3600 
+
+    centrifugo_token = jwt.encode(
+        {"sub": user_id, "exp": expiration}, 
+        settings.CENTRIFUGO_SECRET_KEY, 
+        algorithm="HS256"
+    )
+
     return render(request, 'questions/question.html', {
         'question': question_obj, 
         'answers': page,
-        'form': form
+        'form': form,
+        'centrifugo_token': centrifugo_token
     })
 
 @login_required(login_url='login')
@@ -79,21 +110,8 @@ def vote_question(request):
     if not form.is_valid():
         return JsonResponse({'error': 'Invalid data', 'details': form.errors}, status=400)
 
-    question_id = form.cleaned_data['question_id']
-    action = form.cleaned_data['action']
-    
-    question = get_object_or_404(Question, id=question_id)
-    value = 1 if action == 'like' else -1
-
-    existing_vote = QuestionLike.objects.filter(user=request.user, question=question).first()
-    if existing_vote:
-        return JsonResponse({'message': 'You have already voted for this question'}, status=403)
-
-    QuestionLike.objects.create(user=request.user, question=question, value=value)
-    question.rating += value
-    question.save()
-
-    return JsonResponse({'rating': question.rating})
+    rating = form.save(user=request.user)
+    return JsonResponse({'rating': rating})
 
 @require_POST
 def vote_answer(request):
@@ -109,21 +127,8 @@ def vote_answer(request):
     if not form.is_valid():
         return JsonResponse({'error': 'Invalid data', 'details': form.errors}, status=400)
 
-    answer_id = form.cleaned_data['answer_id']
-    action = form.cleaned_data['action']
-
-    answer = get_object_or_404(Answer, id=answer_id)
-    value = 1 if action == 'like' else -1
-
-    existing_vote = AnswerLike.objects.filter(user=request.user, answer=answer).first()
-    if existing_vote:
-        return JsonResponse({'message': 'You have already voted for this answer'}, status=403)
-
-    AnswerLike.objects.create(user=request.user, answer=answer, value=value)
-    answer.rating += value
-    answer.save()
-
-    return JsonResponse({'rating': answer.rating})
+    rating = form.save(user=request.user)
+    return JsonResponse({'rating': rating})
 
 @require_POST
 def mark_correct(request):
@@ -139,19 +144,30 @@ def mark_correct(request):
     if not form.is_valid():
         return JsonResponse({'error': 'Invalid data', 'details': form.errors}, status=400)
 
-    question_id = form.cleaned_data['question_id']
-    answer_id = form.cleaned_data['answer_id']
+    try:
+        is_correct = form.save(user=request.user)
+        return JsonResponse({'is_correct': is_correct})
+    except forms.ValidationError as e:
+        return JsonResponse({'error': e.message}, status=403)
+    
 
-    question = get_object_or_404(Question, id=question_id)
-    answer = get_object_or_404(Answer, id=answer_id)
+from django.contrib.postgres.search import SearchQuery
 
-    if request.user != question.author:
-        return JsonResponse({'error': 'Permission denied'}, status=403)
+def search_suggestions(request):
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:
+        return JsonResponse({'suggestions': []})
 
-    if answer.question != question:
-        return JsonResponse({'message': 'Answer does not belong to this question'}, status=400)
-
-    answer.is_correct = not answer.is_correct
-    answer.save()
-
-    return JsonResponse({'is_correct': answer.is_correct})
+    search_query = SearchQuery(query)
+    questions = Question.objects.filter(search_vector=search_query).order_by('-rating')[:5]
+    
+    suggestions = [
+        {
+            'id': q.id,
+            'title': q.title,
+            'url': reverse('question', args=[q.id])
+        } for q in questions
+    ]
+    
+    return JsonResponse({'suggestions': suggestions})

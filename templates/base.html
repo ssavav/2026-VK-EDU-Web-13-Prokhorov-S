@@ -24,7 +24,7 @@
                     
                     <div class="col-12 col-md-6 col-lg-7">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="button-addon">
+                            <input type="text" class="form-control search-input" placeholder="Search" aria-label="Search" aria-describedby="button-addon">
                             {% if user.is_authenticated %}
                             <a href="{% url 'ask' %}" class="btn btn-success fw-bold text-white btn-ask-header text-decoration-none" id="button-addon" style="display: flex; align-items: center;">
                                 ASK!
@@ -81,25 +81,28 @@
                         <section class="my-5">
                             <h3 class="h4 mb-3">Popular Tags</h3>
                             <div class="d-flex flex-wrap gap-2 align-items-baseline">
-                                <a href="{% url 'tag' tag_name='perl' %}" class="tag-perl text-decoration-none">perl</a>
-                                <a href="{% url 'tag' tag_name='python' %}" class="tag-python text-decoration-none">python</a>
-                                <a href="{% url 'tag' tag_name='TechnoPark' %}" class="tag-technopark text-decoration-none">TechnoPark</a>
-                                <a href="{% url 'tag' tag_name='MySQL' %}" class="tag-mysql text-decoration-none">MySQL</a>
-                                <a href="{% url 'tag' tag_name='django' %}" class="tag-django text-decoration-none">django</a>
-                                <a href="{% url 'tag' tag_name='Mail.Ru' %}" class="small text-muted text-decoration-none">Mail.Ru</a>
-                                <a href="{% url 'tag' tag_name='Voloshin' %}" class="small text-decoration-none">Voloshin</a>
-                                <a href="{% url 'tag' tag_name='Firefox' %}" class="tag-firefox text-decoration-none">Firefox</a>
+                                {% for tag in popular_tags %}
+                                    <a href="{% url 'tag' tag_name=tag.name %}" class="tag-{{ forloop.counter }} text-decoration-none">
+                                        {{ tag.name }}
+                                    </a>
+                                {% empty %}
+                                    <span class="text-muted">No tags yet</span>
+                                {% endfor %}
                             </div>
                         </section>
 
                         <section>
                             <h3 class="h4 mb-3">Best Members</h3>
                             <ul class="list-unstyled">
-                                <li class="mb-1"><a href="#" class="text-decoration-underline text-primary">Mr. Freeman</a></li>
-                                <li class="mb-1"><a href="#" class="text-decoration-underline text-primary">Dr. House</a></li>
-                                <li class="mb-1"><a href="#" class="text-decoration-underline text-primary">Bender</a></li>
-                                <li class="mb-1"><a href="#" class="text-decoration-underline text-primary">Queen Victoria</a></li>
-                                <li class="mb-1"><a href="#" class="text-decoration-underline text-primary">V. Pupkin</a></li>
+                                {% for profile in best_members %}
+                                    <li class="mb-1">
+                                        <a href="{% url 'public_profile' username=profile.user.username %}" class="text-decoration-underline text-primary">
+                                            {{ profile.user.username }}
+                                        </a>
+                                    </li>
+                                {% empty %}
+                                    <span class="text-muted">No members yet</span>
+                                {% endfor %}
                             </ul>
                         </section>
                     </aside>
@@ -116,5 +119,6 @@
 
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
         <script src="{% static 'js/main.js' %}"></script>
+        <script src="{% static 'js/search.js' %}"></script>
     </body>
 </html>

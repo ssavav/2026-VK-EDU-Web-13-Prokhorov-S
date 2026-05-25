@@ -76,6 +76,21 @@
     font-size: 0.8rem;
     color: #666;
 }
+
+.avatar-img-profile {
+    width: 60px;          
+    height: 60px;         
+    border: 2px solid #000;
+    background-color: #fff;
+    object-fit: cover;  
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+}
 .main-avatar-img {
     width: 80px;          
     height: 80px;         

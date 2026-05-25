@@ -1,7 +1,9 @@
 import random
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from django.db.models import Max
+from django.db.models import Max, Sum, OuterRef, Subquery
+from django.db.models.functions import Coalesce
+from django.contrib.postgres.search import SearchVector
 from core.models import Profile
 from questions.models import Question, Answer, Tag, QuestionLike, AnswerLike
 from faker import Faker
@@ -29,6 +31,7 @@ class Command(BaseCommand):
 
         tags = [Tag(name=f"{fake.word()}_{tag_offset + i}") for i in range(tags_count)]
         Tag.objects.bulk_create(tags, batch_size=BATCH_SIZE)
+        self.stdout.write(f"Успешно создано {tags_count} тегов")
         all_tag_ids = list(Tag.objects.values_list('id', flat=True))
 
         users = [
@@ -39,12 +42,14 @@ class Command(BaseCommand):
             ) for i in range(users_count)
         ]
         User.objects.bulk_create(users, batch_size=BATCH_SIZE)
+        self.stdout.write(f"Успешно создано {users_count} пользователей")
         
         all_user_ids = list(User.objects.values_list('id', flat=True))
         
         new_users_without_profile = User.objects.filter(profile__isnull=True).values_list('id', flat=True)
         profiles = [Profile(user_id=uid) for uid in new_users_without_profile]
         Profile.objects.bulk_create(profiles, batch_size=BATCH_SIZE)
+        self.stdout.write(f"Успешно создано {users_count} профилей")
 
         questions = [
             Question(
@@ -54,7 +59,8 @@ class Command(BaseCommand):
             ) for _ in range(questions_count)
         ]
         created_questions = Question.objects.bulk_create(questions, batch_size=BATCH_SIZE)
-        
+        self.stdout.write(f"Успешно создано {questions_count} вопросов")
+
         new_question_ids = [q.id for q in created_questions]
         all_question_ids = list(Question.objects.values_list('id', flat=True))
 
@@ -75,6 +81,7 @@ class Command(BaseCommand):
             ) for _ in range(answers_count)
         ]
         created_answers = Answer.objects.bulk_create(answers, batch_size=BATCH_SIZE)
+        self.stdout.write(f"Успешно создано {answers_count} ответов")
         all_answer_ids = list(Answer.objects.values_list('id', flat=True))
 
         existing_q_likes = set()
@@ -97,4 +104,13 @@ class Command(BaseCommand):
                 a_likes.append(AnswerLike(user_id=u_id, answer_id=a_id, value=random.choice([1, -1])))
         AnswerLike.objects.bulk_create(a_likes, batch_size=BATCH_SIZE, ignore_conflicts=True)
 
-        self.stdout.write('Заполнение окончено')
+        self.stdout.write(f"Успешно создано {likes_count} оценок вопросов")
+        q_likes = QuestionLike.objects.filter(question=OuterRef('pk')).values('question').annotate(total=Sum('value')).values('total')
+        Question.objects.update(rating=Coalesce(Subquery(q_likes), 0))
+
+        a_likes = AnswerLike.objects.filter(answer=OuterRef('pk')).values('answer').annotate(total=Sum('value')).values('total')
+        Answer.objects.update(rating=Coalesce(Subquery(a_likes), 0))
+
+        Question.objects.update(search_vector=SearchVector('title', weight='A') + SearchVector('text', weight='B'))
+
+        self.stdout.write("Заполнение успешно окончено")

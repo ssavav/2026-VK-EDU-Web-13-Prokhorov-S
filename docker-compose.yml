@@ -10,8 +10,11 @@ services:
       - media_volume:/app/media
     env_file: 
       - .env.docker
+    environment:
+      - REDIS_HOST=redis
     depends_on:              
       - db
+      - redis 
       
   db:
     image: postgres:15-alpine
@@ -23,6 +26,52 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: always
+
+  celery_worker:
+    build: .
+    command: celery -A application worker -l info
+    volumes:
+      - .:/app
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+      - db 
+
+  celery_beat:
+    build: .
+    command: celery -A application beat -l info
+    volumes:
+      - .:/app
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+      - db
+
+  centrifugo:
+    image: centrifugo/centrifugo:v5
+    volumes:
+      - ./config.json:/centrifugo/config.json
+    command: centrifugo -c config.json
+    ports:
+      - 8001:8000
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
 
 volumes:
   postgres_data:
