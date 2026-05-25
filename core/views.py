@@ -4,6 +4,10 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, RegisterForm, ProfileSettingsForm
 
+from django.conf import settings
+from django.http import HttpResponse
+import os
+
 def login(request):
     if request.user.is_authenticated:
         return redirect('index')
@@ -74,3 +78,9 @@ def public_profile(request, username):
 
     target_user = get_object_or_404(User, username=username)
     return render(request, 'core/public_profile.html', {'target_user': target_user})
+
+def dyn_test(request):
+    path = os.path.join(settings.BASE_DIR, "static", "test.html")
+    with open(path, "rb") as f:
+        data = f.read()
+    return HttpResponse(data, content_type="application/octet-stream")
