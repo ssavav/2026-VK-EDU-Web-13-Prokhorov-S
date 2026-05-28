@@ -83,7 +83,8 @@ class RegisterForm(forms.ModelForm):
             user.save()
             Profile.objects.create(
                 user=user,
-                nickname=self.cleaned_data.get('nickname', '')
+                nickname=self.cleaned_data.get('nickname', ''),
+                avatar=self.cleaned_data.get('avatar')
             )
         return user
     

@@ -10,4 +10,5 @@ urlpatterns =[
     path('vote_question/', views.vote_question, name='vote_question'),
     path('vote_answer/', views.vote_answer, name='vote_answer'),
     path('mark_correct/', views.mark_correct, name='mark_correct'),
+    path('search/', views.search_suggestions, name='search_suggestions'),
 ]

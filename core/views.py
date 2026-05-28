@@ -33,7 +33,7 @@ def signup(request):
         return redirect('index')
 
     if request.method == 'POST':
-        form = RegisterForm(request.POST)
+        form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
@@ -61,3 +61,16 @@ def logout_view(request):
     auth_logout(request)
     next_page = request.META.get('HTTP_REFERER', '/')
     return redirect(next_page)
+
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)
+
+def custom_500(request):
+    return render(request, '500.html', status=500)
+
+def public_profile(request, username):
+    from django.shortcuts import get_object_or_404
+    from django.contrib.auth.models import User
+
+    target_user = get_object_or_404(User, username=username)
+    return render(request, 'core/public_profile.html', {'target_user': target_user})

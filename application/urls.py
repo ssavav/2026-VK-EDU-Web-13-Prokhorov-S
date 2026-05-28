@@ -25,6 +25,9 @@ urlpatterns =[
     path('', include('core.urls')),
 ]
 
+handler404 = 'core.views.custom_404'
+handler500 = 'core.views.custom_500'
+
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [

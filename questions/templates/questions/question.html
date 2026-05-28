@@ -40,16 +40,18 @@
         </div>
     </div>
 </div>
+    <div class="ans-list">
+        {% for answer in answers %}
+            <div id="answer-{{ answer.id }}">
+                {% include 'questions/answer_card.html' %}
+            </div>
+        {% empty %}
+            <div class="alert alert-warning alert-no-answers">
+                No answers to that question
+            </div>
+        {% endfor %}
 
-    {% for answer in answers %}
-        <div id="answer-{{ answer.id }}">
-            {% include 'questions/answer_card.html' %}
-        </div>
-    {% empty %}
-        <div class="alert alert-warning">
-            No answers to that question
-        </div>
-    {% endfor %}
+    </div>
     
 {% if user.is_authenticated %}
     <form method="POST">
@@ -78,5 +80,16 @@
     </div>
 {% endif %}
 
+{{ question.id|json_script:"ws-settings-question" }}
+<script id="ws-settings" type="application/json">
+    {
+        "questionId": {{ question.id }},
+        "currentPage": {{ answers.number|default:1 }},
+        "token": "{{ centrifugo_token }}"
+    }
+</script>
+<!-- <script src="https://unpkg.com/centrifuge@5.0.0/dist/centrifuge.js"></script> -->
+<script src="https://unpkg.com/centrifuge@5.0.1/dist/centrifuge.js"></script>
+<script src="{% static 'js/mail.js' %}"></script>
 
 {% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex align-items-center mb-4">
+
+        {% if target_user.profile.avatar %}
+            <img src="{{ target_user.profile.avatar.url }}" alt="{{ target_user.username }}" class="avatar-img mb-2">
+        {% else %}
+            <img src="{% static 'img/avatar.jpg' %}" alt="{{ target_user.username }}" class="avatar-img mb-2">
+        {% endif %}
+        <h2 class="ms-4 mb-0">{{ target_user.username }}</h2>
+    </div>
+
+    <div class="p-4" style="border: 2px black solid;">
+        <h4>User Statistic</h4>
+        <ul class="list-unstyled mb-0 fs-5 mt-3">
+            <li class="mb-2"><strong>Questions asked:</strong> {{ target_user.questions.count }}</li>
+            <li class="mb-2"><strong>Answers given:</strong> {{ target_user.answers.count }}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

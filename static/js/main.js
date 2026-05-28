@@ -43,16 +43,27 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(result => {
                 if (result.status === 200) {
                     ratingSpan.textContent = result.body.rating;
-                    
-                    const btns = document.querySelectorAll(`.vote-question-btn[data-id="${questionId}"]`);
-                    btns.forEach(btn => btn.setAttribute('disabled', 'disabled'));
+
+                    const allBtns = document.querySelectorAll(`.vote-question-btn[data-id="${questionId}"]`);
+                    allBtns.forEach(btn => {
+                        if (btn.dataset.action === 'like') {
+                            btn.classList.remove('btn-success');
+                            btn.classList.add('btn-outline-success');
+                        } else {
+                            btn.classList.remove('btn-danger');
+                            btn.classList.add('btn-outline-danger');
+                        }
+                    });
+
+                    if (this.classList.contains(`btn-outline-${action === 'like' ? 'success' : 'danger'}`)) {
+                        this.classList.remove(`btn-outline-${action === 'like' ? 'success' : 'danger'}`);
+                        this.classList.add(`btn-${action === 'like' ? 'success' : 'danger'}`);
+                    }
                 } else if (result.status === 401) {
                     alert(result.body.message);
                     window.location.href = '/login/';
                 } else {
                     alert(result.body.message);
-                    const btns = document.querySelectorAll(`.vote-question-btn[data-id="${questionId}"]`);
-                    btns.forEach(btn => btn.setAttribute('disabled', 'disabled'));
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -85,15 +96,26 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(result => {
                 if (result.status === 200) {
                     ratingSpan.textContent = result.body.rating;
-                    const btns = document.querySelectorAll(`.vote-answer-btn[data-id="${answerId}"]`);
-                    btns.forEach(btn => btn.setAttribute('disabled', 'disabled'));
+                    const allBtns = document.querySelectorAll(`.vote-answer-btn[data-id="${answerId}"]`);
+                    allBtns.forEach(btn => {
+                        if (btn.dataset.action === 'like') {
+                            btn.classList.remove('btn-success');
+                            btn.classList.add('btn-outline-success');
+                        } else {
+                            btn.classList.remove('btn-danger');
+                            btn.classList.add('btn-outline-danger');
+                        }
+                    });
+
+                    if (this.classList.contains(`btn-outline-${action === 'like' ? 'success' : 'danger'}`)) {
+                        this.classList.remove(`btn-outline-${action === 'like' ? 'success' : 'danger'}`);
+                        this.classList.add(`btn-${action === 'like' ? 'success' : 'danger'}`);
+                    }
                 } else if (result.status === 401) {
                     alert(result.body.message);
                     window.location.href = '/login/';
                 } else {
                     alert(result.body.message);
-                    const btns = document.querySelectorAll(`.vote-answer-btn[data-id="${answerId}"]`);
-                    btns.forEach(btn => btn.setAttribute('disabled', 'disabled'));
                 }
             })
             .catch(error => console.error('Error:', error));
